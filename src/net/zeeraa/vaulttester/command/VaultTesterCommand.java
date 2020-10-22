@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
+import net.zeeraa.vaulttester.command.subcommand.DepositCommand;
 import net.zeeraa.vaulttester.command.subcommand.GetBalanceCommand;
 import net.zeeraa.vaulttester.command.subcommand.HasAccountCommand;
 import net.zeeraa.vaulttester.command.subcommand.HasCommand;
@@ -23,6 +24,7 @@ public class VaultTesterCommand extends ZCommand {
 		addSubCommand(new HasAccountCommand());
 		addSubCommand(new HasCommand());
 		addSubCommand(new WithdrawCommand());
+		addSubCommand(new DepositCommand());
 		addHelpSubCommand();
 		setEmptyTabMode(true);
 		setFilterAutocomplete(true);

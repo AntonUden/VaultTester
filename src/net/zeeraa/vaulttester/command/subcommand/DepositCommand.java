@@ -11,17 +11,19 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 import net.zeeraa.zcommandlib.command.ZSubCommand;
 import net.zeeraa.zcommandlib.command.utils.AllowedSenders;
 
-public class HasAccountCommand extends ZSubCommand {
-	public HasAccountCommand() {
-		super("hasaccount");
-		setPermission("vaulttester.command.vaulttester.hasaccount");
+public class DepositCommand extends ZSubCommand {
+
+	public DepositCommand() {
+		super("deposit");
+		setPermission("vaulttester.command.vaulttester.deposit");
 		setPermissionDefaultValue(PermissionDefault.OP);
 		setAllowedSenders(AllowedSenders.ALL);
-		setDescription("Check if a player has an account");
-		setHelpString("/vaulttester hasaccount [Player]" + ChatColor.AQUA + "Check if a player has an account");
+		setDescription("Deposit amount from player");
+		setHelpString("/vaulttester deposit <Balance> [Player]" + ChatColor.AQUA + "Deposit amount from player");
 		addHelpSubCommand();
 	}
 
@@ -30,6 +32,20 @@ public class HasAccountCommand extends ZSubCommand {
 		Player player = null;
 
 		if (args.length == 0) {
+			sender.sendMessage(ChatColor.RED + "Please provide an amount");
+			return false;
+		}
+
+		double amount;
+
+		try {
+			amount = Double.parseDouble(args[0]);
+		} catch (Exception e) {
+			sender.sendMessage(ChatColor.RED + "Please provide a valid amount");
+			return false;
+		}
+
+		if (args.length == 1) {
 			if (sender instanceof Player) {
 				player = (Player) sender;
 			} else {
@@ -37,28 +53,30 @@ public class HasAccountCommand extends ZSubCommand {
 				return false;
 			}
 		} else {
-			player = Bukkit.getServer().getPlayer(args[0]);
+			player = Bukkit.getServer().getPlayer(args[1]);
 
 			if (player == null) {
-				sender.sendMessage(ChatColor.RED + "Could not find player " + args[0]);
+				sender.sendMessage(ChatColor.RED + "Could not find player " + args[1]);
 				return false;
 			}
 		}
-		
+
 		RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-		
+
 		Economy econ = rsp.getProvider();
-		
-		sender.sendMessage(econ.hasAccount(player) ? ChatColor.GREEN + player.getName() + " has an account" : ChatColor.RED + player.getName() + " does not have an account");
-		
+
+		EconomyResponse res = econ.depositPlayer(player, amount);
+
+		sender.sendMessage(ChatColor.GOLD + "EconomyResponse: Success: " + (res.transactionSuccess() ? ChatColor.GREEN + "true" : ChatColor.RED + "false") + ChatColor.GOLD + ". ResponseType: " + ChatColor.AQUA + res.type.name() + ChatColor.GOLD + ". Amount: " + ChatColor.AQUA + res.amount + ChatColor.GOLD + ". Balance: " + ChatColor.AQUA + res.balance + ChatColor.GOLD + ". ErrorMessage: " + ChatColor.RED + res.errorMessage);
+
 		return true;
 	}
-	
+
 	@Override
 	public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
 		List<String> result = new ArrayList<String>();
 
-		if (args.length == 0 || args.length == 1) {
+		if (args.length == 1 || args.length == 2) {
 			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 				result.add(player.getName());
 			}
