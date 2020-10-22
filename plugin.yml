@@ -1,0 +1,8 @@
+main: net.zeeraa.vaulttester.VaultTester
+version: 1.0
+
+name: VaultTester
+description: A plugin used to test vault economy
+author: Zeeraa
+
+depend: [Vault]
